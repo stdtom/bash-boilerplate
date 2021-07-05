@@ -1,13 +1,61 @@
 #!/usr/bin/env bash
 #
-# A lot of this is based on options.bash by Daniel Mills.
-# @see https://github.com/e36freak/tools/blob/master/options.bash
-
-# Preamble {{{
+# Bash script starter template for easily creating safe shell scripts.
+# This template is based on https://github.com/oxyc/bash-boilerplate and https://newbedev.com/shell-script-common-template
+# Copyright (c) 2021 stdtom
+# Copyright (c) 2012 Oskar Schöldström
+#
 
 set -eo pipefail  # Exit immediately on error
 #set -u            # Exit on unset variables 
-#set -x            # Debug script (print each command before executing)
+
+#================================================================
+# HEADER
+#================================================================
+#% SYNOPSIS
+#+    ${SCRIPT_NAME} [OPTION]... [FILE]...
+#%
+#% DESCRIPTION
+#%    This is a script template
+#%    to start any good shell script.
+#%
+#% OPTIONS
+#%    -u, --username    Username for script
+#%    -p, --password    Input user password, it's recommended to insert
+#%                      this through the interactive option
+#%    -f, --force       Skip all user interaction
+#%    -i, --interactive Prompt for values
+#%    -q, --quiet       Quiet (no output)
+#%    -v, --verbose     Output more
+#%    -h, --help        Display this help and exit
+#%        --version     Output version information and exit
+#%
+#% EXAMPLES
+#%    ${SCRIPT_NAME} -u username
+#%
+#================================================================
+#- IMPLEMENTATION
+#-    version         ${SCRIPT_NAME} ${VERSION}
+#-    author          stdtom
+#-    copyright       Copyright (c) 2021 stdtom
+#-    license         MIT License
+#-    script_id       12345
+#-
+#================================================================
+#  HISTORY
+#     2021/03/01 : stdtom : Script creation
+#     2021/04/01 : stdtom : Add ...
+# 
+#================================================================
+#  DEBUG OPTION
+#    set -n  # Uncomment to check your syntax, without execution.
+#    set -x  # Uncomment to debug this shell script
+#
+#================================================================
+# END_OF_HEADER
+#================================================================
+
+# Preamble {{{
 
 # Detect whether output is piped or not.
 [[ -t 1 ]] && piped=0 || piped=1
@@ -68,34 +116,24 @@ timestamp() {
   date +"%Y-%m-%d_%H-%M-%S"
 }
 
+  #== needed variables ==#
+SCRIPT_HEADSIZE=$(head -200 ${0} |grep -n "^# END_OF_HEADER" | cut -f1 -d:)
+SCRIPT_NAME="$(basename ${0})"
+
+  #== usage functions ==#
+usage() { printf "Usage: "; head -${SCRIPT_HEADSIZE:-99} ${0} | grep -e "^#+" | sed -e "s/^#+[ ]*//g" -e "s/\${SCRIPT_NAME}/${SCRIPT_NAME}/g" ; }
+usagefull() { head -${SCRIPT_HEADSIZE:-99} ${0} | grep -e "^#[%+-]" | sed -e "s/^#[%+-]//g" -e "s/\${SCRIPT_NAME}/${SCRIPT_NAME}/g" ; }
+scriptinfo() { head -${SCRIPT_HEADSIZE:-99} ${0} | grep -e "^#-" | sed -e "s/^#-//g" -e "s/\${SCRIPT_NAME}/${SCRIPT_NAME}/g"; }
 
 # }}}
 # Script logic -- TOUCH THIS {{{
 
-version="v0.1"
+VERSION="v0.1"
 
 # A list of all variables to prompt in interactive mode. These variables HAVE
 # to be named exactly as the longname option definition in usage().
 interactive_opts=(username password)
 
-# Print usage
-usage() {
-  echo -n "$(basename $0) [OPTION]... [FILE]...
-
-Description of this script.
-
- Options:
-  -u, --username    Username for script
-  -p, --password    Input user password, it's recommended to insert
-                    this through the interactive option
-  -f, --force       Skip all user interaction
-  -i, --interactive Prompt for values
-  -q, --quiet       Quiet (no output)
-  -v, --verbose     Output more
-  -h, --help        Display this help and exit
-      --version     Output version information and exit
-"
-}
 
 # Set a trap for cleaning up in case of errors or when script exits.
 rollback() {
@@ -205,8 +243,8 @@ setup_colors
 # Read the options and set stuff
 while [[ $1 = -?* ]]; do
   case $1 in
-    -h|--help) usage >&2; safe_exit ;;
-    --version) out "$(basename $0) $version"; safe_exit ;;
+    -h|--help) usagefull >&2; safe_exit ;;
+    --version) out "${SCRIPT_NAME} ${VERSION}"; safe_exit ;;
     -u|--username) shift; username=$1 ;;
     -p|--password) shift; password=$1 ;;
     -v|--verbose) verbose=1 ;;
