@@ -1,12 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # A lot of this is based on options.bash by Daniel Mills.
 # @see https://github.com/e36freak/tools/blob/master/options.bash
 
 # Preamble {{{
 
-# Exit immediately on error
-set -e
+set -eo pipefail  # Exit immediately on error
+#set -u            # Exit on unset variables 
+#set -x            # Debug script (print each command before executing)
 
 # Detect whether output is piped or not.
 [[ -t 1 ]] && piped=0 || piped=1
