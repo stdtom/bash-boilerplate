@@ -63,6 +63,11 @@ confirm() {
   [[ $REPLY =~ ^[Yy]$ ]];
 }
 
+timestamp() {
+  date +"%Y-%m-%d_%H-%M-%S"
+}
+
+
 # }}}
 # Script logic -- TOUCH THIS {{{
 
